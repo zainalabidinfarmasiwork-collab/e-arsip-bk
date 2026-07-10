@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Arsip Administrasi BK - SMK Kesehatan Amanah Husada Batu</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printArea, #printArea * {
+                visibility: visible;
+            }
+            #printArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-rose-600 text-white p-2 rounded-xl shadow-md shadow-rose-100">
+                        <i data-lucide="heart-pulse" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <span class="text-base font-extrabold text-slate-950 tracking-tight block">SMK KESEHATAN AMANAH HUSADA</span>
+                        <span class="text-[10px] block text-rose-600 font-bold uppercase tracking-wider -mt-1">E-Arsip Administrasi Layanan BK</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="hidden md:inline-flex text-xs bg-rose-50 text-rose-700 px-3 py-1.5 rounded-full font-semibold items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                        Sesi Layanan BK Aktif
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 no-print">
+        
+        <!-- WELCOME BANNER -->
+        <div class="mb-8 bg-gradient-to-r from-rose-950 via-rose-900 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+            <div class="absolute right-0 top-0 translate-x-10 -translate-y-10 opacity-10 pointer-events-none">
+                <i data-lucide="heart-pulse" class="w-96 h-96"></i>
+            </div>
+            <div class="relative z-10 max-w-3xl">
+                <span class="bg-rose-500/20 text-rose-200 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider border border-rose-500/30">SMK KESEHATAN AMANAH HUSADA BATU</span>
+                <h1 class="text-2xl sm:text-4xl font-black mt-3 tracking-tight leading-none text-white">Sistem Administrasi & Rekap Konseling Siswa</h1>
+                <p class="text-rose-100/90 text-sm mt-3 leading-relaxed font-light">
+                    Portal arsip digital bimbingan konseling untuk pencatatan rekam bimbingan pribadi, sosial, belajar, dan karir. Mempermudah penerbitan dokumen laporan resmi yang terintegrasi.
+                </p>
+            </div>
+        </div>
+
+        <!-- TABS CONTROLLER -->
+        <div class="flex border-b border-slate-200 mb-6 gap-2">
+            <button onclick="switchTab('input')" id="tabBtn-input" class="px-5 py-3 text-sm font-bold border-b-2 border-rose-600 text-rose-600 flex items-center gap-2 transition-all duration-200">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                Input Laporan BK
+            </button>
+            <button onclick="switchTab('arsip')" id="tabBtn-arsip" class="px-5 py-3 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 transition-all duration-200">
+                <i data-lucide="archive" class="w-4 h-4"></i>
+                Tab Arsip BK per Siswa
+            </button>
+        </div>
+
+        <!-- ALERT TOAST -->
+        <div id="toast" class="hidden fixed bottom-5 right-5 bg-emerald-600 text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 transform translate-y-10 transition-all duration-300 z-50 border border-emerald-500">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+            <span id="toast-msg" class="text-sm font-semibold">Data berhasil disimpan!</span>
+        </div>
+
+        <!-- ==================== TAB 1: FORM INPUT & CONFIGS ==================== -->
+        <div id="tab-input" class="block space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- FORM INPUT UTAMA (2/3 width) -->
+                <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="px-6 py-5 border-b border-slate-150 bg-slate-50/50 flex justify-between items-center">
+                        <div>
+                            <h2 class="text-sm font-bold text-slate-900">Formulir Laporan BK Baru</h2>
+                            <p class="text-xs text-slate-500">Isi rekam medis bimbingan konseling siswa secara runut.</p>
+                        </div>
+                        <span class="text-[11px] text-rose-600 font-bold bg-rose-50 px-2.5 py-1 rounded-lg">Konseling & Bimbingan</span>
+                    </div>
+
+                    <form id="bk-form" onsubmit="handleFormSubmit(event)" class="p-6 space-y-6">
+                        <!-- Biodata Siswa Section -->
+                        <div>
+                            <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+                                <span class="w-1.5 h-3 bg-rose-600 rounded"></span> Data Identitas Siswa
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- CUSTOM DROP DOWN NAMA SISWA -->
+                                <div class="relative">
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Nama Lengkap Siswa <span class="text-rose-500">*</span></label>
+                                    <div class="relative">
+                                        <input type="text" id="nama_siswa" autocomplete="off" onfocus="showCustomDropdown()" oninput="filterDropdownSiswa()" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all text-sm placeholder-slate-400" placeholder="Ketik nama siswa...">
+                                        <div class="absolute right-3 top-3 text-slate-400 pointer-events-none">
+                                            <i data-lucide="chevron-down" class="w-4 h-4" id="dropdown-icon"></i>
+                                        </div>
+                                    </div>
+
+                                    <!-- BEAUTIFIED DROPDOWN BOX -->
+                                    <div id="custom-dropdown-box" class="hidden absolute left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl z-20 max-h-60 overflow-y-auto overflow-x-hidden divide-y divide-slate-100">
+                                        <!-- Javascript-generated list with delete buttons -->
+                                    </div>
+                                    <span class="text-[10px] text-slate-400 mt-1 block">Ketik untuk menyaring atau pilih dari daftar rekomendasi.</span>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Kelas & Jurusan <span class="text-rose-500">*</span></label>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <select id="jenjang_kelas" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all text-sm font-medium">
+                                            <option value="">-- Pilih Kelas --</option>
+                                            <option value="Kelas X">Kelas X</option>
+                                            <option value="Kelas XI">Kelas XI</option>
+                                            <option value="Kelas XII">Kelas XII</option>
+                                        </select>
+                                        <select id="jurusan_kelas" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all text-sm font-medium">
+                                            <option value="">-- Pilih Jurusan --</option>
+                                            <option value="Teknologi Farmasi">Teknologi Farmasi</option>
+                                            <option value="Layanan Kesehatan">Layanan Kesehatan</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pihak Terkait Section -->
+                        <div class="pt-4 border-t border-slate-100">
+                            <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+                                <span class="w-1.5 h-3 bg-rose-600 rounded"></span> Pihak Terkait & Pendamping
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Wali Kelas <span class="text-rose-500">*</span></label>
+                                    <input type="text" id="wali_kelas" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all text-sm placeholder-slate-400" placeholder="Nama Wali Kelas beserta Gelar">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Guru Wali BK <span class="text-rose-500">*</span></label>
+                                    <input type="text" id="guru_wali" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all text-sm placeholder-slate-400" placeholder="Nama Guru Pembimbing BK">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kasus & Layanan Section -->
+                        <div class="pt-4 border-t border-slate-100">
+                            <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+                                <span class="w-1.5 h-3 bg-rose-600 rounded"></span> Detail Layanan Bimbingan
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div class="md:col-span-1">
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Jenis Layanan <span class="text-rose-500">*</span></label>
+                                    <select id="jenis_layanan" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all text-sm">
+                                        <option value="">-- Pilih Layanan --</option>
+                                        <option value="Bimbingan Pribadi">Bimbingan Pribadi</option>
+                                        <option value="Bimbingan Sosial">Bimbingan Sosial</option>
+                                        <option value="Bimbingan Belajar">Bimbingan Belajar</option>
+                                        <option value="Bimbingan Karir">Bimbingan Karir</option>
+                                        <option value="Konseling Individual">Konseling Individual</option>
+                                        <option value="Konseling Kelompok">Konseling Kelompok</option>
+                                        <option value="Konferensi Kasus">Konferensi Kasus</option>
+                                        <option value="Alih Tangan Kasus">Alih Tangan Kasus (Referral)</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Deskripsi Permasalahan/Kebutuhan <span class="text-rose-500">*</span></label>
+                                    <input type="text" id="deskripsi_kasus" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all text-sm placeholder-slate-400" placeholder="Misal: Sering membolos saat jam produktif Farmasi">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Pendekatan Solusi (Tindakan) <span class="text-rose-500">*</span></label>
+                                    <textarea id="pendekatan_solusi" required rows="4" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all text-sm placeholder-slate-400" placeholder="Jelaskan metode bimbingan atau pendekatan konseling kesehatan yang diberikan..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Evaluasi & Rencana Tindak Lanjut <span class="text-rose-500">*</span></label>
+                                    <textarea id="evaluasi" required rows="4" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all text-sm placeholder-slate-400" placeholder="Hasil evaluasi berkala dan monitoring setelah intervensi bimbingan..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="pt-4 border-t border-slate-150 flex justify-end gap-3">
+                            <button type="button" onclick="clearForm()" class="px-5 py-2.5 text-xs font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all">
+                                Reset Input
+                            </button>
+                            <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-all shadow-md shadow-rose-100 flex items-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i>
+                                Simpan ke Arsip Siswa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- CONFIGURATIONS & BULK IMPORT (1/3 width) -->
+                <div class="space-y-6">
+                    <!-- PANEL PENGATURAN INFORMASI DOKUMEN -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                        <div class="flex items-center gap-2.5 mb-4 pb-3 border-b border-slate-100">
+                            <div class="bg-rose-50 text-rose-600 p-2 rounded-lg">
+                                <i data-lucide="settings" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-900">Pengaturan Dokumen</h3>
+                                <p class="text-[11px] text-slate-400">Konfigurasi tanda tangan laporan resmi BK.</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3.5">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-1">Nama Kepala Sekolah <span class="text-rose-500">*</span></label>
+                                <input type="text" id="cfg_nama_kepsek" value="Apt. Siti Chotimah, S.Si., M.Pd." class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500/10 focus:border-rose-500 text-xs font-semibold">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-1">NIP Kepala Sekolah</label>
+                                <input type="text" id="cfg_nip_kepsek" value="19810415 200501 2 003" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500/10 focus:border-rose-500 text-xs">
+                            </div>
+                            <div class="pt-2 border-t border-slate-100">
+                                <label class="block text-[11px] font-bold text-slate-700 mb-1">Kota Penerbitan Laporan</label>
+                                <input type="text" id="cfg_kota_laporan" value="Batu" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500/10 focus:border-rose-500 text-xs">
+                            </div>
+                            <span class="text-[10px] text-slate-400 italic block mt-2">Perubahan di atas akan otomatis diterapkan pada Kop & Tanda Tangan Dokumen Cetak/Word.</span>
+                        </div>
+                    </div>
+
+                    <!-- PANEL IMPORT SISWA MASSAL -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                        <div class="flex items-center gap-2.5 mb-4 pb-3 border-b border-slate-100">
+                            <div class="bg-rose-50 text-rose-600 p-2 rounded-lg">
+                                <i data-lucide="users-2" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-900">Import Nama Massal</h3>
+                                <p class="text-[11px] text-slate-400">Masukkan daftar nama siswa dengan cepat.</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1.5">Tempel Daftar Nama Siswa</label>
+                                <textarea id="bulk_names" rows="6" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all text-xs placeholder-slate-400" placeholder="Ahmad Subarjo&#10;Siti Nurbaya&#10;(Gunakan baris baru untuk memisahkan)"></textarea>
+                            </div>
+
+                            <button onclick="importBulkNames()" class="w-full py-2.5 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-xl transition-all flex items-center justify-center gap-2">
+                                <i data-lucide="file-text" class="w-4 h-4"></i>
+                                Proses Import Nama
+                            </button>
+
+                            <div class="bg-slate-50 rounded-xl p-3 border border-slate-200/60">
+                                <span class="text-xs font-bold text-slate-700 block mb-1">Daftar Aktif saat ini:</span>
+                                <div id="imported_list_container" class="max-h-32 overflow-y-auto space-y-1 pr-1 text-[11px] text-slate-600">
+                                    <!-- Dynamic elements from JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 2: ARSIP DATA ==================== -->
+        <div id="tab-arsip" class="hidden space-y-6">
+            
+            <!-- Filter & Search Panel -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div class="space-y-3 flex-1">
+                        <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wider block">Filter Kelas & Jurusan:</span>
+                        <div class="flex flex-wrap gap-3 items-center">
+                            <!-- Tombol Reset Semua -->
+                            <button onclick="filterArsip('Semua', 'Semua')" id="btn-filter-Semua-Semua" class="btn-filter px-4 py-2 text-xs font-bold rounded-xl bg-rose-600 text-white shadow-md shadow-rose-100 transition-all duration-200">
+                                Semua Kelas & Jurusan
+                            </button>
+                            
+                            <div class="h-6 w-px bg-slate-200 mx-1 hidden sm:block"></div>
+                            
+                            <!-- Filter Kelompok Kelas X -->
+                            <div class="inline-flex rounded-xl bg-slate-100/80 p-1 gap-1 border border-slate-200/50">
+                                <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider self-center px-2">Kelas X:</span>
+                                <button onclick="filterArsip('Kelas X', 'Teknologi Farmasi')" id="btn-filter-KelasX-Farmasi" class="btn-filter px-3 py-1.5 text-[11px] font-semibold rounded-lg text-slate-600 hover:bg-white hover:text-slate-800 transition-all">
+                                    Farmasi
+                                </button>
+                                <button onclick="filterArsip('Kelas X', 'Layanan Kesehatan')" id="btn-filter-KelasX-Kes" class="btn-filter px-3 py-1.5 text-[11px] font-semibold rounded-lg text-slate-600 hover:bg-white hover:text-slate-800 transition-all">
+                                    Layanan Kes
+                                </button>
+                            </div>
+
+                            <!-- Filter Kelompok Kelas XI -->
+                            <div class="inline-flex rounded-xl bg-slate-100/80 p-1 gap-1 border border-slate-200/50">
+                                <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider self-center px-2">Kelas XI:</span>
+                                <button onclick="filterArsip('Kelas XI', 'Teknologi Farmasi')" id="btn-filter-KelasXI-Farmasi" class="btn-filter px-3 py-1.5 text-[11px] font-semibold rounded-lg text-slate-600 hover:bg-white hover:text-slate-800 transition-all">
+                                    Farmasi
+                                </button>
+                                <button onclick="filterArsip('Kelas XI', 'Layanan Kesehatan')" id="btn-filter-KelasXI-Kes" class="btn-filter px-3 py-1.5 text-[11px] font-semibold rounded-lg text-slate-600 hover:bg-white hover:text-slate-800 transition-all">
+                                    Layanan Kes
+                                </button>
+                            </div>
+
+                            <!-- Filter Kelompok Kelas XII -->
+                            <div class="inline-flex rounded-xl bg-slate-100/80 p-1 gap-1 border border-slate-200/50">
+                                <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider self-center px-2">Kelas XII:</span>
+                                <button onclick="filterArsip('Kelas XII', 'Teknologi Farmasi')" id="btn-filter-KelasXII-Farmasi" class="btn-filter px-3 py-1.5 text-[11px] font-semibold rounded-lg text-slate-600 hover:bg-white hover:text-slate-800 transition-all">
+                                    Farmasi
+                                </button>
+                                <button onclick="filterArsip('Kelas XII', 'Layanan Kesehatan')" id="btn-filter-KelasXII-Kes" class="btn-filter px-3 py-1.5 text-[11px] font-semibold rounded-lg text-slate-600 hover:bg-white hover:text-slate-800 transition-all">
+                                    Layanan Kes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative min-w-[240px]">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
+                        <input type="text" id="search-input" oninput="handleSearch()" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all text-xs" placeholder="Cari nama siswa...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table/List Data Arsip -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            Daftar Laporan Terarsip (Dikelompokkan per Siswa)
+                            <span id="arsip-count" class="text-xs font-semibold bg-rose-100 text-rose-700 px-2.5 py-0.5 rounded-full">0 Siswa</span>
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-100 bg-slate-50/20">
+                                <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Identitas Siswa</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Wali Kelas</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Riwayat Konseling BK & Solusi</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Aksi Keseluruhan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="arsip-table-body" class="divide-y divide-slate-100 text-slate-700">
+                            <!-- JS Generated Rows -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="p-12 text-center flex flex-col items-center justify-center">
+                    <div class="bg-slate-100 p-4 rounded-full text-slate-400 mb-3">
+                        <i data-lucide="folder-open" class="w-8 h-8"></i>
+                    </div>
+                    <h4 class="text-sm font-bold text-slate-800">Tidak ada data arsip</h4>
+                    <p class="text-xs text-slate-400 mt-1 max-w-sm">Mulai isi formulir input bimbingan konseling untuk menyimpan rekam jejak administrasi siswa.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL PRATINJAU & EKSPOR DOKUMEN -->
+    <div id="previewModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col border border-slate-200">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="bg-rose-100 text-rose-700 p-1.5 rounded-lg">
+                        <i data-lucide="file-check" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900" id="modal-title-name">Pratinjau Dokumen Rekap BK</h3>
+                        <p class="text-[11px] text-slate-500">Semua riwayat konseling dikompilasi ke dalam satu berkas siap pakai.</p>
+                    </div>
+                </div>
+                <button onclick="closePreviewModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content (Scrollable Pratinjau Dokumen) -->
+            <div class="p-6 overflow-y-auto flex-1 bg-slate-100/50">
+                <div class="bg-white p-8 rounded-xl shadow-inner border border-slate-200 max-w-3xl mx-auto" id="modal-document-frame">
+                    <!-- Dinamis terisi oleh JS -->
+                </div>
+            </div>
+
+            <!-- Modal Footer (Action Buttons) -->
+            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex flex-wrap gap-3 justify-between items-center">
+                <span class="text-[11px] text-slate-500 flex items-center gap-1">
+                    <i data-lucide="info" class="w-3.5 h-3.5 text-rose-600"></i>
+                    Tip: Anda dapat langsung menyimpan dokumen ke PDF via menu Cetak.
+                </span>
+                <div class="flex gap-2">
+                    <button onclick="closePreviewModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-150 rounded-xl transition-all">
+                        Tutup
+                    </button>
+                    <button onclick="exportToWordFile()" class="px-4 py-2 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-xl transition-all flex items-center gap-1.5">
+                        <i data-lucide="file-down" class="w-4 h-4"></i>
+                        Unduh Word (.doc)
+                    </button>
+                    <button onclick="printGeneratedDocument()" class="px-5 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-all shadow-md shadow-rose-100 flex items-center gap-1.5">
+                        <i data-lucide="printer" class="w-4 h-4"></i>
+                        Cetak / Simpan PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM CONFIRMATION MODAL (Replaces confirm()) -->
+    <div id="confirmModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+            <div class="flex items-center gap-3 text-rose-600 mb-4">
+                <div class="bg-rose-50 p-2.5 rounded-xl">
+                    <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-base font-bold text-slate-900">Konfirmasi Aksi</h3>
+            </div>
+            <p id="confirmModalMessage" class="text-xs text-slate-600 leading-relaxed">Apakah Anda yakin ingin melakukan tindakan ini?</p>
+            <div class="mt-6 flex justify-end gap-3">
+                <button id="confirmCancelBtn" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-100 rounded-xl transition-all">
+                    Batal
+                </button>
+                <button id="confirmOkBtn" class="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-all">
+                    Ya, Lanjutkan
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==================== AREA CETAK AKTIF / EXPORT DOCUMENT (HIDDEN BY DEFAULT) ==================== -->
+    <div id="printArea" class="hidden bg-white p-8 max-w-4xl mx-auto text-black">
+        <!-- Diisi secara dinamis saat melakukan ekspor atau cetak -->
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- JAVASCRIPT LOGIC -->
+    <!-- ======================================================= -->
+    <script>
+        
+        // Database internal Nama Siswa hasil import
+        let databaseSiswa = [
+            "Rizky Ramadhan",
+            "Amelia Putri",
+            "Gibran Al-Farizi"
+        ];
+
+        // Data Mockup Awal Rekam Jejak Konseling BK
+        let arsipData = [
+            {
+                id: "1",
+                tanggal: "2026-07-09",
+                nama: "Rizky Ramadhan",
+                jenjang: "Kelas X",
+                jurusan: "Teknologi Farmasi",
+                waliKelas: "Siti Rahma, S.Pd.",
+                guruWali: "Drs. Bambang Hidayat",
+                jenisLayanan: "Konseling Individual",
+                deskripsi: "Siswa sering mengantuk di kelas pada jam pelajaran pertama. Prestasi belajar menurun dalam sebulan terakhir.",
+                pendekatan: "Konseling individu dengan metode Realitas (Reality Therapy). Mencari tahu kebiasaan tidur malam siswa. Ditemukan siswa sering bermain game hingga larut malam.",
+                evaluasi: "Siswa berjanji membatasi jam main game maksimal pukul 21.00 WIB. Wali kelas akan mengamati perkembangan di kelas seminggu ke depan."
+            },
+            {
+                id: "2",
+                tanggal: "2026-07-08",
+                nama: "Amelia Putri",
+                jenjang: "Kelas XI",
+                jurusan: "Layanan Kesehatan",
+                waliKelas: "Budi Santoso, M.Pd.",
+                guruWali: "Diah Pramesti, S.Psi.",
+                jenisLayanan: "Bimbingan Karir",
+                deskripsi: "Siswa bingung memilih kelanjutan studi setelah lulus, ada tekanan dari orang tua untuk masuk sekolah kejuruan sedangkan siswa ingin sekolah umum.",
+                pendekatan: "Pendekatan direktif dengan memberikan asesmen minat bakat menggunakan inventori karir sederhana, dilanjutkan dengan diskusi komparatif kelebihan vokasi vs umum.",
+                evaluasi: "Siswa mendapatkan gambaran objektif kelebihan masing-masing sekolah. Direncanakan pemanggilan orang tua bersama siswa."
+            },
+            {
+                id: "3",
+                tanggal: "2026-07-07",
+                nama: "Gibran Al-Farizi",
+                jenjang: "Kelas XII",
+                jurusan: "Teknologi Farmasi",
+                waliKelas: "Rina Kartika, S.S.",
+                guruWali: "Drs. Bambang Hidayat",
+                jenisLayanan: "Bimbingan Sosial",
+                deskripsi: "Mengalami perselisihan paham dengan teman sekelas yang berujung pada pengelompokan (geng) di kelas.",
+                pendekatan: "Mediasi konflik antar kedua belah pihak di ruang BK menggunakan pendekatan restoratif (Restorative Justice).",
+                evaluasi: "Kedua pihak sepakat berdamai dan menandatangani surat perjanjian tidak mengulangi tindakan provokasi sosial di kelas."
+            },
+            {
+                id: "4",
+                tanggal: "2026-07-10",
+                nama: "Rizky Ramadhan",
+                jenjang: "Kelas X",
+                jurusan: "Teknologi Farmasi",
+                waliKelas: "Siti Rahma, S.Pd.",
+                guruWali: "Drs. Bambang Hidayat",
+                jenisLayanan: "Bimbingan Belajar",
+                deskripsi: "Siswa meminta bimbingan strategi belajar efektif menyambut ujian tengah semester bidang farmakognosi.",
+                pendekatan: "Memberikan teknik mnemonik jembatan keledai untuk menghafal nama ilmiah tanaman obat serta latihan manajemen waktu belajar.",
+                evaluasi: "Siswa merasa lebih percaya diri dan motivasi belajarnya meningkat setelah konsultasi."
+            }
+        ];
+
+        let activeTab = 'input';
+        let filterKelasAktif = 'Semua';
+        let filterJurusanAktif = 'Semua';
+        let searchQuery = '';
+        let selectedStudentForExport = null;
+
+        // Callback kustom untuk dialog modal konfirmasi
+        let confirmActionCallback = null;
+
+        window.onload = function() {
+            lucide.createIcons();
+            updateSiswaDatalist();
+            renderArsipTable();
+
+            // Sembunyikan dropdown kustom ketika klik di luar dropdown
+            document.addEventListener('click', function(e) {
+                const dropdownBox = document.getElementById('custom-dropdown-box');
+                const inputField = document.getElementById('nama_siswa');
+                if (e.target !== inputField && !dropdownBox.contains(e.target)) {
+                    hideCustomDropdown();
+                }
+            });
+        };
+
+        // Ganti Tab Utama
+        function switchTab(tab) {
+            activeTab = tab;
+            
+            const tabInput = document.getElementById('tab-input');
+            const tabArsip = document.getElementById('tab-arsip');
+            const btnInput = document.getElementById('tabBtn-input');
+            const btnArsip = document.getElementById('tabBtn-arsip');
+
+            if (tab === 'input') {
+                tabInput.classList.remove('hidden');
+                tabArsip.classList.add('hidden');
+                
+                btnInput.className = "px-5 py-3 text-sm font-bold border-b-2 border-rose-600 text-rose-600 flex items-center gap-2 transition-all duration-200";
+                btnArsip.className = "px-5 py-3 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 transition-all duration-200";
+            } else {
+                tabInput.classList.add('hidden');
+                tabArsip.classList.remove('hidden');
+                
+                btnInput.className = "px-5 py-3 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 transition-all duration-200";
+                btnArsip.className = "px-5 py-3 text-sm font-bold border-b-2 border-rose-600 text-rose-600 flex items-center gap-2 transition-all duration-200";
+                renderArsipTable();
+            }
+        }
+
+
+        // Menampilkan Dropdown Kustom
+        function showCustomDropdown() {
+            const dropdownBox = document.getElementById('custom-dropdown-box');
+            dropdownBox.classList.remove('hidden');
+            filterDropdownSiswa(); // Saring berdasarkan ketikan saat ini
+        }
+
+        // Menyembunyikan Dropdown Kustom
+        function hideCustomDropdown() {
+            const dropdownBox = document.getElementById('custom-dropdown-box');
+            setTimeout(() => {
+                dropdownBox.classList.add('hidden');
+            }, 100);
+        }
+
+        // Menyaring isi Dropdown Kustom berdasarkan Input Guru
+        function filterDropdownSiswa() {
+            const query = document.getElementById('nama_siswa').value.toLowerCase();
+            const dropdownBox = document.getElementById('custom-dropdown-box');
+            
+            const filtered = databaseSiswa.filter(name => name.toLowerCase().includes(query));
+
+            if (filtered.length === 0) {
+                dropdownBox.innerHTML = `
+                    <div class="px-4 py-3 text-xs text-slate-400 italic">
+                        Nama tidak ditemukan. Tekan 'Tab' atau lanjutkan mengetik nama baru untuk mendaftarkan.
+                    </div>
+                `;
+                return;
+            }
+
+            dropdownBox.innerHTML = '';
+            filtered.forEach(name => {
+                const row = document.createElement('div');
+                row.className = "px-4 py-2.5 hover:bg-rose-50/50 flex items-center justify-between text-xs transition-colors cursor-pointer";
+                
+                // Set click action on name text
+                row.innerHTML = `
+                    <div onclick="selectStudentName('${name}')" class="flex-1 font-semibold text-slate-700 py-1 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                        ${name}
+                    </div>
+                    <button type="button" onclick="event.stopPropagation(); deleteSiswaFromDb('${name}')" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition-all" title="Hapus dari daftar">
+                        <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+                    </button>
+                `;
+                dropdownBox.appendChild(row);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Memilih Nama dari Dropdown
+        function selectStudentName(name) {
+            document.getElementById('nama_siswa').value = name;
+            hideCustomDropdown();
+            showToast(`Siswa "${name}" dipilih.`);
+        }
+
+        // Menghapus Nama dari Database / Dropdown List
+        function deleteSiswaFromDb(name) {
+            showCustomConfirm(`Apakah Anda yakin ingin menghapus nama "${name}" dari daftar dropdown rekomendasi?`, () => {
+                databaseSiswa = databaseSiswa.filter(item => item !== name);
+                updateSiswaDatalist();
+                filterDropdownSiswa();
+                showToast(`Nama "${name}" berhasil dihapus dari sistem.`);
+            });
+        }
+
+        // Import Bulk Nama Siswa
+        function importBulkNames() {
+            const bulkText = document.getElementById('bulk_names').value;
+            if (!bulkText.trim()) {
+                showToast("Harap masukkan teks nama siswa terlebih dahulu.");
+                return;
+            }
+
+            const namesArray = bulkText.split('\n')
+                .map(name => name.trim())
+                .filter(name => name.length > 0);
+
+            let importedCount = 0;
+            namesArray.forEach(name => {
+                if (!databaseSiswa.some(existingName => existingName.toLowerCase() === name.toLowerCase())) {
+                    databaseSiswa.push(name);
+                    importedCount++;
+                }
+            });
+
+            showToast(`${importedCount} Nama berhasil di-import ke daftar dropdown!`);
+            document.getElementById('bulk_names').value = '';
+            updateSiswaDatalist();
+        }
+
+        // Update visual list nama yang aktif di panel samping
+        function updateSiswaDatalist() {
+            const listContainer = document.getElementById('imported_list_container');
+            databaseSiswa.sort();
+
+            if (databaseSiswa.length === 0) {
+                listContainer.innerHTML = '<span class="text-slate-400 italic text-xs">Belum ada nama yang di-import.</span>';
+            } else {
+                listContainer.innerHTML = '';
+                databaseSiswa.forEach(siswa => {
+                    const item = document.createElement('div');
+                    item.className = "flex items-center justify-between gap-2 bg-white px-2.5 py-1.5 rounded-lg border border-slate-150 hover:bg-slate-50 transition-colors";
+                    item.innerHTML = `
+                        <div onclick="selectStudentName('${siswa}')" class="truncate font-medium text-slate-700 cursor-pointer flex items-center gap-1.5 flex-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                            <span class="truncate">${siswa}</span>
+                        </div>
+                        <button type="button" onclick="deleteSiswaFromDb('${siswa}')" class="text-slate-400 hover:text-rose-600 p-1 hover:bg-rose-50 rounded transition-all">
+                            <i data-lucide="trash" class="w-3 h-3"></i>
+                        </button>
+                    `;
+                    listContainer.appendChild(item);
+                });
+            }
+            lucide.createIcons();
+        }
+
+
+        // Form Submit Handler
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const nama = document.getElementById('nama_siswa').value.trim();
+            const jenjang = document.getElementById('jenjang_kelas').value;
+            const jurusan = document.getElementById('jurusan_kelas').value;
+            const waliKelas = document.getElementById('wali_kelas').value;
+            const guruWali = document.getElementById('guru_wali').value;
+            const jenisLayanan = document.getElementById('jenis_layanan').value;
+            const deskripsi = document.getElementById('deskripsi_kasus').value;
+            const pendekatan = document.getElementById('pendekatan_solusi').value;
+            const evaluasi = document.getElementById('evaluasi').value;
+
+            const hariIni = new Date().toISOString().split('T')[0];
+
+            const dataBaru = {
+                id: Date.now().toString(),
+                tanggal: hariIni,
+                nama,
+                jenjang,
+                jurusan,
+                waliKelas,
+                guruWali,
+                jenisLayanan,
+                deskripsi,
+                pendekatan,
+                evaluasi
+            };
+
+            // Tambahkan ke databaseSiswa jika belum terdaftar
+            if (!databaseSiswa.some(s => s.toLowerCase() === nama.toLowerCase())) {
+                databaseSiswa.push(nama);
+                updateSiswaDatalist();
+            }
+
+            arsipData.unshift(dataBaru);
+            showToast("Laporan Administrasi BK berhasil disimpan!");
+            clearForm();
+            
+            setTimeout(() => {
+                switchTab('arsip');
+            }, 600);
+        }
+
+        // Reset form input
+        function clearForm() {
+            document.getElementById('bk-form').reset();
+        }
+
+        // Tampilkan Toast Notifikasi
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            toastMsg.innerText = message;
+            
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-10');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-10');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }, 3000);
+        }
+
+        // Filter Kelas & Jurusan Terpadu
+        function filterArsip(kelas, jurusan) {
+            filterKelasAktif = kelas;
+            filterJurusanAktif = jurusan;
+            
+            // Atur ulang visual semua tombol filter
+            const buttons = document.querySelectorAll('.btn-filter');
+            buttons.forEach(btn => {
+                if (btn.id === 'btn-filter-Semua-Semua') {
+                    btn.className = "btn-filter px-4 py-2 text-xs font-bold rounded-xl bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all";
+                } else {
+                    btn.className = "btn-filter px-3 py-1.5 text-[11px] font-semibold rounded-lg text-slate-600 hover:bg-white hover:text-slate-800 transition-all";
+                }
+            });
+
+            // Setel kelas aktif pada tombol yang dipilih
+            const btnSemua = document.getElementById('btn-filter-Semua-Semua');
+            if (kelas === 'Semua' && jurusan === 'Semua') {
+                btnSemua.className = "btn-filter px-4 py-2 text-xs font-bold rounded-xl bg-rose-600 text-white shadow-md shadow-rose-100 transition-all duration-200";
+            } else {
+                let targetId = '';
+                if (kelas === 'Kelas X') {
+                    targetId = jurusan === 'Teknologi Farmasi' ? 'btn-filter-KelasX-Farmasi' : 'btn-filter-KelasX-Kes';
+                } else if (kelas === 'Kelas XI') {
+                    targetId = jurusan === 'Teknologi Farmasi' ? 'btn-filter-KelasXI-Farmasi' : 'btn-filter-KelasXI-Kes';
+                } else if (kelas === 'Kelas XII') {
+                    targetId = jurusan === 'Teknologi Farmasi' ? 'btn-filter-KelasXII-Farmasi' : 'btn-filter-KelasXII-Kes';
+                }
+                
+                const activeBtn = document.getElementById(targetId);
+                if (activeBtn) {
+                    activeBtn.className = "btn-filter px-3 py-1.5 text-[11px] font-bold rounded-lg bg-rose-600 text-white shadow-xs transition-all";
+                }
+            }
+
+            renderArsipTable();
+        }
+
+        // Search Input
+        function handleSearch() {
+            searchQuery = document.getElementById('search-input').value.toLowerCase();
+            renderArsipTable();
+        }
+
+
+        // Render Tabel Data (Dengan pengelompokan nama siswa sama + riwayat bimbingan kronologis)
+        function renderArsipTable() {
+            const tableBody = document.getElementById('arsip-table-body');
+            const emptyState = document.getElementById('empty-state');
+            
+            const groupedSiswa = {};
+            
+            arsipData.forEach(item => {
+                const lowerName = item.nama.toLowerCase();
+                if (!groupedSiswa[lowerName]) {
+                    groupedSiswa[lowerName] = {
+                        nama: item.nama,
+                        jenjang: item.jenjang,
+                        jurusan: item.jurusan,
+                        waliKelas: item.waliKelas,
+                        guruWali: item.guruWali,
+                        riwayat: []
+                    };
+                }
+                groupedSiswa[lowerName].riwayat.push(item);
+            });
+
+            let filteredGrouped = Object.values(groupedSiswa).filter(siswa => {
+                const matchKelas = (filterKelasAktif === 'Semua') || (siswa.jenjang === filterKelasAktif);
+                const matchJurusan = (filterJurusanAktif === 'Semua') || (siswa.jurusan === filterJurusanAktif);
+                const matchSearch = siswa.nama.toLowerCase().includes(searchQuery);
+                return matchKelas && matchJurusan && matchSearch;
+            });
+
+            filteredGrouped.sort((a, b) => a.nama.localeCompare(b.nama));
+
+            document.getElementById('arsip-count').innerText = `${filteredGrouped.length} Siswa`;
+
+            if (filteredGrouped.length === 0) {
+                tableBody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            tableBody.innerHTML = '';
+
+            filteredGrouped.forEach(siswa => {
+                siswa.riwayat.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50/40 transition-colors duration-150 align-top";
+                
+                let riwayatHTML = `<div class="space-y-3 max-h-64 overflow-y-auto pr-1">`;
+                siswa.riwayat.forEach((session, index) => {
+                    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                    const tgl = new Date(session.tanggal).toLocaleDateString('id-ID', options);
+                    
+                    riwayatHTML += `
+                        <div class="bg-slate-50 border border-slate-150 p-3 rounded-xl hover:border-rose-200 transition-all text-xs relative group/item">
+                            <div class="flex items-center justify-between gap-2 mb-1">
+                                <span class="font-bold text-slate-700">Sesi #${index + 1} (${tgl})</span>
+                                <span class="text-[10px] font-bold bg-rose-50 text-rose-700 px-2 py-0.5 rounded border border-rose-100">
+                                    ${session.jenisLayanan}
+                                </span>
+                            </div>
+                            <p class="text-slate-600 line-clamp-2 mt-1 mb-2" title="${session.deskripsi}">
+                                <strong class="text-slate-800">Kasus:</strong> ${session.deskripsi}
+                            </p>
+                            <div class="flex justify-between items-center pt-2 border-t border-slate-200/60">
+                                <span class="text-[10px] text-slate-500 italic">BK: ${session.guruWali}</span>
+                                <div class="flex gap-1.5">
+                                    <button onclick="deleteSession('${session.id}')" class="bg-white hover:bg-rose-50 text-rose-600 p-1.5 rounded border border-slate-200 hover:border-rose-200 transition-all" title="Hapus Laporan Sesi Ini">
+                                        <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                riwayatHTML += `</div>`;
+
+                row.innerHTML = `
+                    <td class="px-6 py-5 whitespace-nowrap">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-rose-50 text-rose-600 font-bold rounded-xl flex items-center justify-center text-sm border border-rose-100">
+                                ${siswa.nama.substring(0,2).toUpperCase()}
+                            </div>
+                            <div>
+                                <div class="text-sm font-bold text-slate-900">${siswa.nama}</div>
+                                <div class="text-xs text-rose-600 font-bold mt-0.5">${siswa.jenjang}</div>
+                                <div class="text-[10px] text-slate-500 font-medium mt-0.5">${siswa.jurusan}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="text-xs font-semibold text-slate-800">${siswa.waliKelas}</div>
+                        <div class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">Wali Kelas Aktif</div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <i data-lucide="history" class="w-3.5 h-3.5 text-rose-500"></i> 
+                            Rekam Bimbingan (${siswa.riwayat.length} Sesi)
+                        </div>
+                        ${riwayatHTML}
+                    </td>
+                    <td class="px-6 py-5 text-right whitespace-nowrap text-xs font-medium">
+                        <div class="flex flex-col gap-2 justify-center h-full">
+                            <button onclick="previewAndPrepareExport('${siswa.nama}')" class="bg-rose-600 hover:bg-rose-700 text-white px-3.5 py-2.5 rounded-xl transition-all inline-flex items-center justify-center gap-1.5 shadow-md shadow-rose-100" title="Ekspor Rekap Konseling">
+                                <i data-lucide="file-text" class="w-4 h-4"></i>
+                                Ekspor Dokumen
+                            </button>
+                            <button onclick="deleteSiswaGroup('${siswa.nama}')" class="border border-rose-200 text-rose-600 hover:bg-rose-50 px-3.5 py-2.5 rounded-xl transition-all inline-flex items-center justify-center gap-1.5" title="Hapus Semua Riwayat Siswa">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                Hapus Siswa
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Hapus satu sesi bimbingan spesifik
+        function deleteSession(sessionId) {
+            showCustomConfirm("Apakah Anda yakin ingin menghapus laporan sesi konseling terpilih ini?", () => {
+                arsipData = arsipData.filter(data => data.id !== sessionId);
+                renderArsipTable();
+                showToast("Sesi bimbingan berhasil dihapus.");
+            });
+        }
+
+        // Hapus semua grup riwayat siswa berdasarkan nama
+        function deleteSiswaGroup(namaSiswa) {
+            showCustomConfirm(`Apakah Anda yakin ingin menghapus seluruh data siswa "${namaSiswa}" beserta semua riwayat konselingnya?`, () => {
+                arsipData = arsipData.filter(data => data.nama.toLowerCase() !== namaSiswa.toLowerCase());
+                renderArsipTable();
+                showToast(`Semua rekap data bimbingan "${namaSiswa}" telah dihapus.`);
+            });
+        }
+
+
+        // Menghasilkan Dokumen Lengkap berisi semua riwayat bimbingan siswa tersebut
+        function generateConsolidatedDocumentHTML(namaSiswa) {
+            const riwayatSiswa = arsipData.filter(item => item.nama.toLowerCase() === namaSiswa.toLowerCase());
+            if (riwayatSiswa.length === 0) return '';
+
+            riwayatSiswa.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+
+            const sInfo = riwayatSiswa[riwayatSiswa.length - 1]; 
+            const tglOpsi = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const hariCetak = new Date().toLocaleDateString('id-ID', tglOpsi);
+
+            // Ambil data konfigurasi dinamis kepala sekolah dan tempat cetak
+            const namaKepsek = document.getElementById('cfg_nama_kepsek').value || "Apt. Siti Chotimah, S.Si., M.Pd.";
+            const nipKepsek = document.getElementById('cfg_nip_kepsek').value ? `NIP. ${document.getElementById('cfg_nip_kepsek').value}` : "NIP. -";
+            const kotaLaporan = document.getElementById('cfg_kota_laporan').value || "Batu";
+
+            // Bangun Bagian Sesi Konseling
+            let sessionsHTML = '';
+            riwayatSiswa.forEach((sesi, index) => {
+                const tglSesi = new Date(sesi.tanggal).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+                sessionsHTML += `
+                    <div style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed #cccccc; page-break-inside: avoid;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <h4 style="font-size: 13px; font-weight: bold; color: #1e293b; margin: 0; text-transform: uppercase;">Sesi Bimbingan #${index + 1}</h4>
+                            <span style="font-size: 11px; background-color: #f1f5f9; border: 1px solid #cbd5e1; padding: 2px 8px; border-radius: 4px; font-weight: bold;">
+                                Tanggal Sesi: ${tglSesi}
+                            </span>
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 5px; margin-bottom: 10px;">
+                            <tr>
+                                <td style="width: 130px; font-weight: bold; vertical-align: top; padding: 4px 0; color: #475569;">Jenis Layanan</td>
+                                <td style="vertical-align: top; padding: 4px 0;">: <span style="font-weight: 600; text-decoration: underline;">${sesi.jenisLayanan}</span></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: bold; vertical-align: top; padding: 4px 0; color: #475569;">Guru Pembimbing BK</td>
+                                <td style="vertical-align: top; padding: 4px 0;">: ${sesi.guruWali}</td>
+                            </tr>
+                        </table>
+                        
+                        <div style="margin-top: 6px; margin-bottom: 10px;">
+                            <strong style="display: block; font-size: 11px; color: #334155; margin-bottom: 3px;">A. Deskripsi Permasalahan / Kasus:</strong>
+                            <p style="margin: 0; font-size: 11px; line-height: 1.5; color: #334155; text-align: justify; padding-left: 10px; border-left: 2px solid #f43f5e;">
+                                ${sesi.deskripsi}
+                            </p>
+                        </div>
+
+                        <div style="margin-top: 10px; margin-bottom: 10px;">
+                            <strong style="display: block; font-size: 11px; color: #334155; margin-bottom: 3px;">B. Pendekatan Solusi (Tindakan):</strong>
+                            <p style="margin: 0; font-size: 11px; line-height: 1.5; color: #334155; text-align: justify; padding-left: 10px; border-left: 2px solid #f43f5e;">
+                                ${sesi.pendekatan}
+                            </p>
+                        </div>
+
+                        <div style="margin-top: 10px;">
+                            <strong style="display: block; font-size: 11px; color: #334155; margin-bottom: 3px;">C. Evaluasi & Rencana Tindak Lanjut:</strong>
+                            <p style="margin: 0; font-size: 11px; line-height: 1.5; color: #334155; text-align: justify; padding-left: 10px; border-left: 2px solid #f43f5e;">
+                                ${sesi.evaluasi}
+                            </p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Bangun Template Lengkap Siap Cetak Branded SMK Kesehatan Amanah Husada Batu
+            return `
+                <!-- KOP SURAT SEKOLAH -->
+                <div style="display: flex; align-items: center; justify-content: space-between; border-b: 4px double #000000; padding-bottom: 12px; margin-bottom: 20px;">
+                    <div style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; border: 2px solid #000000; font-weight: bold; font-size: 10px; text-align: center; border-radius: 6px; line-height: 1.1;">
+                        SMK<br><span style="font-size: 7px; color: #e11d48;">KESEHATAN</span>
+                    </div>
+                    <div style="text-align: center; flex: 1; padding: 0 15px;">
+                        <h1 style="font-size: 11px; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">YAYASAN AMANAH AL-HAZIM</h1>
+                        <h2 style="font-size: 14px; font-weight: 800; margin: 2px 0 0 0; text-transform: uppercase;">SMK KESEHATAN AMANAH HUSADA BATU</h2>
+                        <p style="font-size: 9px; font-style: italic; margin: 3px 0 0 0; color: #555555;">Kompetensi Keahlian: Teknologi Farmasi • Layanan Kesehatan</p>
+                        <p style="font-size: 8px; margin: 1px 0 0 0; color: #666666;">Ijin Operasional No: 421.5/3702/422.103/2015 - NPSN: 69941718</p>
+                        <p style="font-size: 8px; font-weight: bold; margin: 2px 0 0 0; color: #333333;">Jl. Raya Punten No. 12, Kec. Bumiaji, Kota Batu, Jawa Timur • Telp: (0341) 5102344</p>
+                    </div>
+                    <div style="width: 70px;"></div> <!-- Spacer -->
+                </div>
+
+                <!-- JUDUL LAPORAN -->
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h3 style="font-size: 13px; font-weight: bold; text-transform: uppercase; text-decoration: underline; margin: 0;">REKAPITULASI DOKUMEN ADMINISTRASI BIMBINGAN & KONSELING</h3>
+                    <p style="font-size: 10px; color: #444444; margin: 4px 0 0 0;">Nomor Arsip: BK/SMK-AH/${sInfo.jenjang.replace("Kelas ", "")}/${riwayatSiswa.length}-SESI</p>
+                </div>
+
+                <!-- BIODATA KOTAK DETAIL -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #cccccc; padding: 12px; border-radius: 8px; background-color: #fafafa; margin-bottom: 25px; font-size: 11px; gap: 8px 15px;">
+                    <div style="grid-column: span 1;">
+                        <span style="font-weight: bold; color: #666666; font-size: 9px; text-transform: uppercase; display: block; margin-bottom: 2px;">Nama Lengkap Siswa</span>
+                        <span style="font-size: 12px; font-weight: bold; color: #000000;">${sInfo.nama}</span>
+                    </div>
+                    <div style="grid-column: span 1;">
+                        <span style="font-weight: bold; color: #666666; font-size: 9px; text-transform: uppercase; display: block; margin-bottom: 2px;">Kelas & Kompetensi Keahlian</span>
+                        <span style="font-size: 12px; font-weight: bold; color: #000000;">${sInfo.jenjang} - ${sInfo.jurusan}</span>
+                    </div>
+                    <div style="grid-column: span 1; margin-top: 4px;">
+                        <span style="font-weight: bold; color: #666666; font-size: 9px; text-transform: uppercase; display: block; margin-bottom: 2px;">Wali Kelas Pendamping</span>
+                        <span style="font-size: 11px; font-weight: 600; color: #333333;">${sInfo.waliKelas}</span>
+                    </div>
+                    <div style="grid-column: span 1; margin-top: 4px;">
+                        <span style="font-weight: bold; color: #666666; font-size: 9px; text-transform: uppercase; display: block; margin-bottom: 2px;">Jumlah Sesi Konseling Terdaftar</span>
+                        <span style="font-size: 11px; font-weight: 600; color: #e11d48;">${riwayatSiswa.length} Sesi Terlaksana</span>
+                    </div>
+                </div>
+
+                <!-- RIWAYAT DETAIL KONSUL -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="font-size: 12px; font-weight: bold; border-bottom: 2px solid #000000; padding-bottom: 4px; margin-bottom: 15px; text-transform: uppercase;">DAFTAR RIWAYAT KONSULTASI SISWA</h3>
+                    ${sessionsHTML}
+                </div>
+
+                <!-- BAGIAN TANDA TANGAN -->
+                <div style="margin-top: 35px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 11px; text-align: center; page-break-inside: avoid;">
+                    <div>
+                        <p style="margin: 0;">Mengetahui,</p>
+                        <p style="font-weight: bold; margin: 2px 0 0 0;">Kepala Sekolah</p>
+                        <div style="height: 55px;"></div>
+                        <p style="font-weight: bold; text-decoration: underline; margin: 0;">${namaKepsek}</p>
+                        <p style="font-size: 9px; color: #555555; margin: 2px 0 0 0;">${nipKepsek}</p>
+                    </div>
+                    <div>
+                        <p style="margin: 0; color: transparent;">Spacer</p>
+                        <p style="font-weight: bold; margin: 2px 0 0 0;">Wali Kelas</p>
+                        <div style="height: 55px;"></div>
+                        <p style="font-weight: bold; text-decoration: underline; margin: 0;">${sInfo.waliKelas}</p>
+                        <p style="font-size: 9px; color: #555555; margin: 2px 0 0 0;">NIP. - / NUPTK</p>
+                    </div>
+                    <div>
+                        <p style="margin: 0;">Dibuat di: ${kotaLaporan}</p>
+                        <p style="font-weight: bold; margin: 2px 0 0 0;">Guru Bimbingan Konseling</p>
+                        <div style="height: 55px;"></div>
+                        <p style="font-weight: bold; text-decoration: underline; margin: 0;">${sInfo.guruWali}</p>
+                        <p style="font-size: 9px; color: #555555; margin: 2px 0 0 0;">NIP. Staff Aktif BK</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Buka Pratinjau Dokumen Rekap
+        function previewAndPrepareExport(namaSiswa) {
+            selectedStudentForExport = namaSiswa;
+            
+            const documentContent = generateConsolidatedDocumentHTML(namaSiswa);
+            if (!documentContent) {
+                showToast("Gagal memproses dokumen. Riwayat konseling tidak ditemukan.");
+                return;
+            }
+
+            document.getElementById('modal-title-name').innerText = `Rekap Laporan - ${namaSiswa}`;
+            document.getElementById('modal-document-frame').innerHTML = documentContent;
+
+            const modal = document.getElementById('previewModal');
+            modal.classList.remove('hidden');
+        }
+
+        // Tutup Modal
+        function closePreviewModal() {
+            const modal = document.getElementById('previewModal');
+            modal.classList.add('hidden');
+            selectedStudentForExport = null;
+        }
+
+        // Cetak Dokumen via Dialog Browser
+        function printGeneratedDocument() {
+            if (!selectedStudentForExport) return;
+            
+            const documentContent = generateConsolidatedDocumentHTML(selectedStudentForExport);
+            const printArea = document.getElementById('printArea');
+            printArea.innerHTML = documentContent;
+
+            window.print();
+        }
+
+        // Ekspor ke Berkas MS Word (.doc) asli
+        function exportToWordFile() {
+            if (!selectedStudentForExport) return;
+
+            const documentContent = generateConsolidatedDocumentHTML(selectedStudentForExport);
+            
+            const htmlHeaderAndStyle = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <title>Rekap Administrasi BK - ${selectedStudentForExport}</title>
+                    <style>
+                        body {
+                            font-family: 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+                            font-size: 11pt;
+                            line-height: 1.5;
+                            color: #000000;
+                            padding: 20px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${documentContent}
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob(['\ufeff' + htmlHeaderAndStyle], {
+                type: 'application/msword'
+            });
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Rekap_Dokumen_BK_${selectedStudentForExport.replace(/\s+/g, '_')}.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            showToast(`Berkas Word untuk "${selectedStudentForExport}" berhasil diunduh!`);
+        }
+
+
+        // Menampilkan Dialog Konfirmasi Pengganti confirm() bawaan
+        function showCustomConfirm(message, onConfirm) {
+            const confirmModal = document.getElementById('confirmModal');
+            const confirmMsg = document.getElementById('confirmModalMessage');
+            const okBtn = document.getElementById('confirmOkBtn');
+            const cancelBtn = document.getElementById('confirmCancelBtn');
+
+            confirmMsg.innerText = message;
+            confirmModal.classList.remove('hidden');
+
+            // Reset action listeners
+            const cleanOkBtn = okBtn.cloneNode(true);
+            const cleanCancelBtn = cancelBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(cleanOkBtn, okBtn);
+            cancelBtn.parentNode.replaceChild(cleanCancelBtn, cancelBtn);
+
+            cleanOkBtn.addEventListener('click', () => {
+                confirmModal.classList.add('hidden');
+                onConfirm();
+            });
+
+            cleanCancelBtn.addEventListener('click', () => {
+                confirmModal.classList.add('hidden');
+            });
+        }
+    </script>
+</body>
+</html>
